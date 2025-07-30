@@ -6,6 +6,10 @@ set(CMAKE_CXX_STANDARD 17)
 #  将 glad 添加为子目录。
 add_subdirectory(external/glad glad)
 
+# 移动资源文件夹Resources到项目根目录
+set(RESOURCE_DIR "${CMAKE_SOURCE_DIR}/shaders")
+file(COPY ${RESOURCE_DIR} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 
