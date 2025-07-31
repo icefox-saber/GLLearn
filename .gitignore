@@ -1,3 +1,4 @@
 build/
 test
 test.cpp
+input.txt

@@ -1,9 +1,9 @@
-#include <fstream>
 #include <string>
-#include <filesystem>
 #include "cppFun.h"
 
-std::string readFileToString(const std::filesystem::path& filePath) {
+template<>
+std::string readFile<std::string>(const std::filesystem::path& filePath) {
+    //std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
     std::ifstream file(filePath, std::ios::binary);
     if (!file) {
         throw std::runtime_error("Cannot open file: " + filePath.string());
@@ -13,6 +13,7 @@ std::string readFileToString(const std::filesystem::path& filePath) {
     const auto fileSize = std::filesystem::file_size(filePath);
     std::string content(fileSize, '\0');
     file.read(content.data(), fileSize);
+    file.close();
     
     return content;
 }
