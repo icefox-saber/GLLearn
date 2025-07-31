@@ -4,7 +4,7 @@ project(MyOpenGLProject)
 set(CMAKE_CXX_STANDARD 17)
 
 #  将 glad 添加为子目录。
-add_subdirectory(external/glad glad)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/glad glad)
 
 # 移动资源文件夹Resources到项目根目录
 set(RESOURCE_DIR "${CMAKE_SOURCE_DIR}/shaders")
@@ -16,7 +16,8 @@ find_package(glfw3 REQUIRED)
 include_directories(
     ${OPENGL_INCLUDE_DIR}
     ${glfw3_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include # 添加 glad 头文件路径
+    ${CMAKE_CURRENT_SOURCE_DIR}/glad/include # 添加 glad 头文件路径
+    ${CMAKE_CURRENT_SOURCE_DIR}/include # 添加项目头文件路径
 )
 
 add_executable(MyOpenGLApp src/main.cpp)
