@@ -1,31 +1,15 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "GLFun.h"
 #include <fstream>
 #include <iostream>
+#include "cppFun.h"
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-void processInput(GLFWwindow *window);
-
-std::string ReadFile(const std::string &filePath)
-{
-    // 读取./shaders/VertexShader.vert并且存入string中
-    std::string ShaderSource;
-    std::ifstream vertexShaderFile(filePath);
-    if (vertexShaderFile)
-    {
-        ShaderSource.assign(std::istreambuf_iterator<char>(vertexShaderFile),
-                                  std::istreambuf_iterator<char>());
-    }
-    vertexShaderFile.close();
-    return ShaderSource;
-}
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-std::string vertexShaderSource = ReadFile("./shaders/VertexShader.vert");
-std::string fragmentShaderSource = ReadFile("./shaders/FragmentShader.frag");
+std::string vertexShaderSource = readFileToString("./shaders/VertexShader.vert");
+std::string fragmentShaderSource = readFileToString("./shaders/FragmentShader.frag");
 
 
 int main()
@@ -183,21 +167,4 @@ int main()
     // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
-}
-
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
-
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    // make sure the viewport matches the new window dimensions; note that width and 
-    // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height);
 }

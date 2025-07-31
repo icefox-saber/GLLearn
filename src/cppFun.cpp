@@ -1,6 +1,7 @@
 #include <fstream>
 #include <string>
 #include <filesystem>
+#include "cppFun.h"
 
 std::string readFileToString(const std::filesystem::path& filePath) {
     std::ifstream file(filePath, std::ios::binary);

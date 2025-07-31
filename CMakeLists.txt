@@ -20,7 +20,8 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include # 添加项目头文件路径
 )
 
-add_executable(MyOpenGLApp src/main.cpp)
+file(GLOB SRC_FILES src/*.cpp)
+add_executable(MyOpenGLApp ${SRC_FILES})
 
 target_link_libraries(MyOpenGLApp
     ${OPENGL_LIBRARIES}
