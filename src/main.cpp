@@ -1,3 +1,5 @@
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include "GLFun.h"
 #include "cppFun.h"
 
@@ -5,11 +7,20 @@
 #include <array>
 #include <cmath>
 
-std::string VertexShader = readFile<std::string>("shaders/VertexShader.vert");
-std::string FragmentShader = readFile<std::string>("shaders/FragmentShader.frag");
+std::string VertexShader = readFile<std::string>("./resources/shaders/VertexShader.vert");
+std::string FragmentShader = readFile<std::string>("./resources/shaders/FragmentShader.frag");
 
 int main()
 {
+
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("./resources/textures/container.jpg", &width, &height, &nrChannels, 0);
+    if (!data)
+    {
+        std::cout << "Loading image failed" << std::endl;
+        return -1;
+    }
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -36,6 +47,17 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
 
     int success;
 
@@ -81,29 +103,32 @@ int main()
     glDeleteShader(VertexShaderID);
     glDeleteShader(FragmentShaderID);
 
-    std::array<float, 18> vertices = {
+    std::array<float, 24> vertices = {
         -0.5f,
         -0.5f,
         0.f,
-
         1.0f,
+        0.f,
+        0.f,
         0.f,
         0.f,
 
         0.5f,
         -0.5f,
         0.f,
-
         0.0f,
+        1.f,
+        0.f,
         1.f,
         0.f,
 
         0.f,
         0.5f,
         0.f,
-
         0.0f,
         0.f,
+        1.f,
+        0.5f,
         1.f,
     };
 
@@ -111,16 +136,19 @@ int main()
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-
+    glBindTexture(GL_TEXTURE_2D, texture);
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
     glBindVertexArray(0);
-
+    glBindVertexArray(VAO);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glBindVertexArray(0);
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
@@ -132,7 +160,8 @@ int main()
         float greenValue = (sin(timeValue) / 2.0) + 0.5f;
         int vertexColorLocation = glGetUniformLocation(ProgramID, "outColor");
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(VAO);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glDrawArrays(GL_TRIANGLES, 0, 3);
