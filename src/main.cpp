@@ -6,12 +6,16 @@
 #include <iostream>
 #include <array>
 #include <cmath>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 std::string VertexShader = readFile<std::string>("./resources/shaders/VertexShader.vert");
 std::string FragmentShader = readFile<std::string>("./resources/shaders/FragmentShader.frag");
 
 int main()
 {
+
     stbi_set_flip_vertically_on_load(true);
     int width, height, nrChannels;
     unsigned char *data = stbi_load("./resources/textures/container.jpg", &width, &height, &nrChannels, 0);
@@ -180,12 +184,19 @@ int main()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
     glBindVertexArray(0);
+
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
         glClearColor(0.2f, 0.3f, 0.3f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(ProgramID);
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.5f, 0.5f, 0.0f));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        // trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+        unsigned int transformLoc = glGetUniformLocation(ProgramID, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
         glUniform1i(glGetUniformLocation(ProgramID, "Texture1"), 0);
         glUniform1i(glGetUniformLocation(ProgramID, "Texture2"), 1);
         float timeValue = glfwGetTime();
