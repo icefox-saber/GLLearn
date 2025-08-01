@@ -12,7 +12,7 @@ std::string FragmentShader = readFile<std::string>("./resources/shaders/Fragment
 
 int main()
 {
-
+    stbi_set_flip_vertically_on_load(true);
     int width, height, nrChannels;
     unsigned char *data = stbi_load("./resources/textures/container.jpg", &width, &height, &nrChannels, 0);
     if (!data)
@@ -48,14 +48,31 @@ int main()
         return -1;
     }
 
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    unsigned int texture1;
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(data);
+
+    data = stbi_load("./resources/textures/awesomeface.png", &width, &height, &nrChannels, 0);
+    if (!data)
+    {
+        std::cout << "Loading image failed" << std::endl;
+        return -1;
+    }
+    unsigned int texture2;
+    glGenTextures(1, &texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
 
@@ -103,7 +120,7 @@ int main()
     glDeleteShader(VertexShaderID);
     glDeleteShader(FragmentShaderID);
 
-    std::array<float, 24> vertices = {
+    std::array<float, 32> vertices = {
         -0.5f,
         -0.5f,
         0.f,
@@ -122,23 +139,37 @@ int main()
         1.f,
         0.f,
 
+        -0.5f,
+        0.5f,
         0.f,
+        1.0f,
+        0.f,
+        0.f,
+        0.f,
+        1.f,
+
+        0.5f,
         0.5f,
         0.f,
         0.0f,
+        1.f,
         0.f,
         1.f,
-        0.5f,
         1.f,
     };
 
-    unsigned int VBO, VAO;
+    std::array<unsigned int, 6> indices = {0, 1, 2, 1, 2, 3};
+
+    unsigned int VBO, VAO, VEO;
 
     glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VEO);
     glGenBuffers(1, &VBO);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindTexture(GL_TEXTURE_2D, texture1);
     glBindVertexArray(VAO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VEO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices.data(), GL_STATIC_DRAW);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
@@ -155,16 +186,19 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(ProgramID);
-
+        glUniform1i(glGetUniformLocation(ProgramID, "Texture1"), 0);
+        glUniform1i(glGetUniformLocation(ProgramID, "Texture2"), 1);
         float timeValue = glfwGetTime();
         float greenValue = (sin(timeValue) / 2.0) + 0.5f;
         int vertexColorLocation = glGetUniformLocation(ProgramID, "outColor");
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
         glBindVertexArray(VAO);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
         glfwSwapBuffers(window);
         glfwPollEvents();
