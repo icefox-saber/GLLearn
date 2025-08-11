@@ -10,8 +10,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-std::string VertexShader = readFile<std::string>("./resources/shaders/VertexShader.vert");
-std::string FragmentShader = readFile<std::string>("./resources/shaders/FragmentShader.frag");
+std::string VertexShader = readFile<std::string>("./resources/shaders/VertexShader.glsl");
+std::string FragmentShader = readFile<std::string>("./resources/shaders/FragmentShader.glsl");
 
 int main()
 {
