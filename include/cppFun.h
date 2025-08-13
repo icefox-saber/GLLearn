@@ -6,7 +6,7 @@
 #include <iostream>
 
 template <typename DestT>
-DestT readFile(const std::filesystem::path& filePath);
+DestT ReadFile(const std::filesystem::path& filePath);
 
 template<>
-std::string readFile<std::string>(const std::filesystem::path& filePath);
+std::string ReadFile<std::string>(const std::filesystem::path& filePath);

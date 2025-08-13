@@ -2,7 +2,7 @@
 #include "cppFun.h"
 
 template<>
-std::string readFile<std::string>(const std::filesystem::path& filePath) {
+std::string ReadFile<std::string>(const std::filesystem::path& filePath) {
     //std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
     std::ifstream file(filePath, std::ios::binary);
     if (!file) {
