@@ -2,6 +2,8 @@
 #include "stb_image.h"
 #include "GLFun.h"
 #include "cppFun.h"
+#include "shader.h"
+#include "Window.h"
 #include <iostream>
 #include <array>
 #include <cmath>
@@ -9,11 +11,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-std::string VertexShader = ReadFile<std::string>("./resources/shaders/VertexShader.glsl");
-std::string FragmentShader = ReadFile<std::string>("./resources/shaders/FragmentShader.glsl");
+
 
 int main()
 {
+    Window wd;
+    GLFWwindow *window = wd.Get();
 
     stbi_set_flip_vertically_on_load(true);
     int width, height, nrChannels;
@@ -24,32 +27,7 @@ int main()
         return -1;
     }
 
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
-    GLFWwindow *window = glfwCreateWindow(800, 600, "LearnGL", nullptr, nullptr);
-
-    if (!window)
-    {
-        std::cerr << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-    }
-
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    // ---------------------------------------
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
+   
 
     unsigned int texture1;
     glGenTextures(1, &texture1);
@@ -79,49 +57,7 @@ int main()
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
 
-    int success;
-
-    int VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-    const char *VertexShaderSource = VertexShader.data();
-    glShaderSource(VertexShaderID, 1, &VertexShaderSource, nullptr);
-    glCompileShader(VertexShaderID);
-    glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        char infoLog[512];
-        glGetShaderInfoLog(VertexShaderID, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
-    }
-
-    int FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-    const char *FragmentShaderSource = FragmentShader.data();
-    glShaderSource(FragmentShaderID, 1, &FragmentShaderSource, nullptr);
-    glCompileShader(FragmentShaderID);
-    glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        char infoLog[512];
-        glGetShaderInfoLog(FragmentShaderID, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::Fragment::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
-    }
-
-    int ProgramID = glCreateProgram();
-    glAttachShader(ProgramID, VertexShaderID);
-    glAttachShader(ProgramID, FragmentShaderID);
-    glLinkProgram(ProgramID);
-    glGetProgramiv(ProgramID, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        char infoLog[512];
-        glGetProgramInfoLog(ProgramID, 512, nullptr, infoLog);
-        std::cout << "ERROR::ProgramID::Link_FAILED\n"
-                  << infoLog << std::endl;
-    }
-
-    glDeleteShader(VertexShaderID);
-    glDeleteShader(FragmentShaderID);
+    Shader sd("./resources/shaders/VertexShader.glsl","./resources/shaders/FragmentShader.glsl");
 
     std::array<float, 32> vertices = {
         -0.5f,
@@ -189,18 +125,17 @@ int main()
         processInput(window);
         glClearColor(0.2f, 0.3f, 0.3f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
-        glUseProgram(ProgramID);
+        glUseProgram(sd.GetID());
         glm::mat4 trans = glm::mat4(1.0f);
         trans = glm::translate(trans, glm::vec3(0.5f, 0.5f, 0.0f));
         trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        //trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-        unsigned int transformLoc = glGetUniformLocation(ProgramID, "transform");
+        unsigned int transformLoc = glGetUniformLocation(sd.GetID(), "transform");
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-        glUniform1i(glGetUniformLocation(ProgramID, "Texture1"), 0);
-        glUniform1i(glGetUniformLocation(ProgramID, "Texture2"), 1);
+        glUniform1i(glGetUniformLocation(sd.GetID(), "Texture1"), 0);
+        glUniform1i(glGetUniformLocation(sd.GetID(), "Texture2"), 1);
         float timeValue = glfwGetTime();
         float greenValue = (sin(timeValue) / 2.0) + 0.5f;
-        int vertexColorLocation = glGetUniformLocation(ProgramID, "outColor");
+        int vertexColorLocation = glGetUniformLocation(sd.GetID(), "outColor");
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
