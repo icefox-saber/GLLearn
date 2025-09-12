@@ -3,6 +3,7 @@
 #include "cppFun.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 #include <filesystem>
 class Shader {
   private:
@@ -15,5 +16,7 @@ class Shader {
     void Set(const std::string &name, bool value) const;
     void Set(const std::string &name, int value) const;
     void Set(const std::string &name, float value) const;
+    void setMat4(const std::string &name, const glm::mat4 &mat) const;
+
     ~Shader();
 };

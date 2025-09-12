@@ -22,6 +22,7 @@ Window::Window(int Major, int Minor, int Width, int Height) {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     assert(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress));
+    glEnable(GL_DEPTH_TEST);
 }
 
 GLFWwindow *Window::Get() {
