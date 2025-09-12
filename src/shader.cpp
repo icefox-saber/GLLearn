@@ -50,7 +50,6 @@ int Shader::GetID() {
 }
 
 Shader::~Shader() {
-    glDeleteProgram(ID);
 }
 
 void Shader::Set(const std::string &name, bool value) const {
