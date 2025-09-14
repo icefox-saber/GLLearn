@@ -1,0 +1,80 @@
+[main] ÕıÔÚÉú³ÉÎÄ¼ş¼Ğ: d:/Users/72886/Downloads/GLLearn/build MyOpenGLApp
+[build] ÕıÔÚÆô¶¯Éú³É
+[proc] ÕıÔÚÖ´ĞĞÃüÁî: "D:\Program Files\CMake\bin\cmake.EXE" --build d:/Users/72886/Downloads/GLLearn/build --config Release --target MyOpenGLApp -j 16 --
+[build] é€‚ç”¨äº? .NET Framework MSBuild ç‰ˆæœ¬ 17.14.23+b0019275e
+[build] 
+[build]   1>Checking Build System
+[build]   Building Custom Rule D:/Users/72886/Downloads/GLLearn/glfw/src/CMakeLists.txt
+[build]   Building Custom Rule D:/Users/72886/Downloads/GLLearn/glm/glm/CMakeLists.txt
+[build]   glm.cpp
+[build]   context.c
+[build]   init.c
+[build]   input.c
+[build]   monitor.c
+[build]   platform.c
+[build]   vulkan.c
+[build]   window.c
+[build]   egl_context.c
+[build]   glm.vcxproj -> D:\Users\72886\Downloads\GLLearn\build\glm\glm\Release\glm.lib
+[build]   osmesa_context.c
+[build]   null_init.c
+[build]   null_monitor.c
+[build]   null_window.c
+[build]   null_joystick.c
+[build]   win32_module.c
+[build]   win32_time.c
+[build]   win32_thread.c
+[build]   win32_init.c
+[build]   win32_joystick.c
+[build]   win32_monitor.c
+[build]   win32_window.c
+[build]   æ­£åœ¨ç”Ÿæˆä»£ç ...
+[build]   æ­£åœ¨ç¼–è¯‘...
+[build]   wgl_context.c
+[build]   æ­£åœ¨ç”Ÿæˆä»£ç ...
+[build]   glfw.vcxproj -> D:\Users\72886\Downloads\GLLearn\build\glfw\src\Release\glfw3.lib
+[build]   Building Custom Rule D:/Users/72886/Downloads/GLLearn/CMakeLists.txt
+[build]   cppFun.cpp
+[build] D:\Users\72886\Downloads\GLLearn\src\cppFun.cpp(14,25): warning C4244: â€œå‚æ•°â€?: ä»â€œconst uintmax_tâ€è½¬æ¢åˆ°â€œconst unsigned intâ€ï¼Œå?èƒ½ä¸¢å¤±æ•°æ? [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build]   main.cpp
+[build]   shader.cpp
+[build]   æ­£åœ¨ç”Ÿæˆä»£ç ...
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glTexParameteriï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glTexImage2Dï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glClearï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glClearColorï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glEnableï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glViewportï¼Œå‡½æ•? "void __cdecl framebuffer_size_callback(struct GLFWwindow *,int,int)" (?framebuffer_size_callback@@YAXPAUGLFWwindow@@HH@Z) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glDrawArraysï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glBindTextureï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glGenTexturesï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glActiveTextureï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glBindBufferï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glDeleteBuffersï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glGenBuffersï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glBufferDataï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glEnableVertexAttribArrayï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glVertexAttribPointerï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glGenerateMipmapï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glBindVertexArrayï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glDeleteVertexArraysï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] main.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glGenVertexArraysï¼Œå‡½æ•? _main ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] shader.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glAttachShaderï¼Œå‡½æ•? "public: __thiscall Shader::Shader(class std::filesystem::path,class std::filesystem::path)" (??0Shader@@QAE@Vpath@filesystem@std@@0@Z) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] shader.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glCompileShaderï¼Œå‡½æ•? "public: __thiscall Shader::Shader(class std::filesystem::path,class std::filesystem::path)" (??0Shader@@QAE@Vpath@filesystem@std@@0@Z) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] shader.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glCreateProgramï¼Œå‡½æ•? "public: __thiscall Shader::Shader(class std::filesystem::path,class std::filesystem::path)" (??0Shader@@QAE@Vpath@filesystem@std@@0@Z) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] shader.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glCreateShaderï¼Œå‡½æ•? "public: __thiscall Shader::Shader(class std::filesystem::path,class std::filesystem::path)" (??0Shader@@QAE@Vpath@filesystem@std@@0@Z) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] shader.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glDeleteShaderï¼Œå‡½æ•? "public: __thiscall Shader::Shader(class std::filesystem::path,class std::filesystem::path)" (??0Shader@@QAE@Vpath@filesystem@std@@0@Z) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] shader.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glGetProgramivï¼Œå‡½æ•? "public: __thiscall Shader::Shader(class std::filesystem::path,class std::filesystem::path)" (??0Shader@@QAE@Vpath@filesystem@std@@0@Z) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] shader.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glGetProgramInfoLogï¼Œå‡½æ•? "public: __thiscall Shader::Shader(class std::filesystem::path,class std::filesystem::path)" (??0Shader@@QAE@Vpath@filesystem@std@@0@Z) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] shader.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glGetShaderivï¼Œå‡½æ•? "public: __thiscall Shader::Shader(class std::filesystem::path,class std::filesystem::path)" (??0Shader@@QAE@Vpath@filesystem@std@@0@Z) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] shader.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glGetShaderInfoLogï¼Œå‡½æ•? "public: __thiscall Shader::Shader(class std::filesystem::path,class std::filesystem::path)" (??0Shader@@QAE@Vpath@filesystem@std@@0@Z) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] shader.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glGetUniformLocationï¼Œå‡½æ•? "public: void __thiscall Shader::Set(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &,int)const " (?Set@Shader@@QBEXABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@H@Z) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] shader.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glLinkProgramï¼Œå‡½æ•? "public: __thiscall Shader::Shader(class std::filesystem::path,class std::filesystem::path)" (??0Shader@@QAE@Vpath@filesystem@std@@0@Z) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] shader.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glShaderSourceï¼Œå‡½æ•? "public: __thiscall Shader::Shader(class std::filesystem::path,class std::filesystem::path)" (??0Shader@@QAE@Vpath@filesystem@std@@0@Z) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] shader.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glUseProgramï¼Œå‡½æ•? "public: void __thiscall Shader::Use(void)" (?Use@Shader@@QAEXXZ) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] shader.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glUniform1fï¼Œå‡½æ•? "public: void __thiscall Shader::Set(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &,float)const " (?Set@Shader@@QBEXABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@M@Z) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] shader.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glUniform1iï¼Œå‡½æ•? "public: void __thiscall Shader::Set(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &,int)const " (?Set@Shader@@QBEXABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@H@Z) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] shader.obj : error LNK2019: æ— æ³•è§£æçš„å?–éƒ¨ç¬¦å· _glad_glUniformMatrix4fvï¼Œå‡½æ•? "public: void __thiscall Shader::setMat4(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &,struct glm::mat<4,4,float,0> const &)const " (?setMat4@Shader@@QBEXABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@ABU?$mat@$03$03M$0A@@glm@@@Z) ä¸?å¼•ç”¨äº†è?¥ç?¦å· [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[build] D:\Users\72886\Downloads\GLLearn\build\Release\MyOpenGLApp.exe : fatal error LNK1120: 36 ä¸?æ— æ³•è§£æçš„å?–éƒ¨å‘½ä»¤ [D:\Users\72886\Downloads\GLLearn\build\MyOpenGLApp.vcxproj]
+[proc] ÃüÁî¡°"D:\Program Files\CMake\bin\cmake.EXE" --build d:/Users/72886/Downloads/GLLearn/build --config Release --target MyOpenGLApp -j 16 --¡±ÒÑÍË³ö£¬´úÂëÎª 1
+[driver] Éú³ÉÍê±Ï: 00:00:14.447
