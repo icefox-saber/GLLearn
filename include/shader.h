@@ -9,7 +9,7 @@ class Shader {
   private:
     int ID;
 
-  public:
+public:
     Shader(std::filesystem::path VertexShaderPath, std::filesystem::path FragmentShaderPath);
     void use();
     int GetID();
