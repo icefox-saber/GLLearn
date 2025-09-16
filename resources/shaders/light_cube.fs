@@ -1,7 +1,12 @@
 #version 330 core
+
 out vec4 FragColor;
 
-void main()
-{
-    FragColor = vec4(1.0); // set all 4 vector values to 1.0
+uniform float uLightIntensity;
+uniform vec3 uLightColor;
+
+void main(void) {
+    
+  //gl_FragColor = vec4(1,1,1, 1.0);
+  FragColor = vec4(uLightColor, 1.0);
 }

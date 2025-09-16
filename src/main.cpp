@@ -73,11 +73,12 @@ int main()
     }
 
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
-    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(false);//true
 
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_CULL_FACE);
 
     // build and compile shaders
     // -------------------------
@@ -85,8 +86,8 @@ int main()
 
     // load models
     // -----------
-    Model ourModel(std::filesystem::path("./resources/objects/backpack/backpack.obj").string());
-
+    Model ourModel(std::filesystem::path("./resources/assets/mary/Marry.obj").string());
+    //Model ourModel(std::filesystem::path("./resources/objects/backpack/backpack.obj").string());
     
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -113,19 +114,37 @@ int main()
         // don't forget to enable shader before setting uniforms
         ourShader.use();
 
-        // view/projection transformations
+       // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
-        ourShader.setMat4("projection", projection);
-        ourShader.setMat4("view", view);
+
+        // model matrix
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+
+        // vertex shader expects uProjectionMatrix and uModelViewMatrix (modelView = view * model)
+        glm::mat4 modelView = view * model;
+        ourShader.setMat4("uProjectionMatrix", projection);
+        ourShader.setMat4("uModelViewMatrix", modelView);
+
+        // 固定光源位置并传入 fragment shader
+        glm::vec3 lightPos = glm::vec3(1.2f, 1.0f, 2.0f); // 固定光源位置，可按需修改
+        ourShader.setVec3("uLightPos", lightPos);
+        ourShader.Set("uLightIntensity", 1.0f);
+
+        // 传入相机位置（用于镜面反射计算）
+        // Camera 类通常有 public 成员 Position
+        ourShader.setVec3("uCameraPos", camera.Position);
+
+        // 传入材质参数（漫反射/镜面反射），以及是否采样纹理
+        ourShader.setVec3("uKd", glm::vec3(1.0f, 0.5f, 0.31f)); // 漫反射基色
+        ourShader.setVec3("uKs", glm::vec3(0.5f));              // 镜面反射颜色/强度
+        ourShader.Set("uTextureSample", 1);                  // 0 = 不使用纹理, 1 = 使用纹理
 
         // render the loaded model
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-        ourShader.setMat4("model", model);
+        ourShader.setMat4("model", model); // 若 Model.Draw 依赖 model uniform 保留（安全）
         ourModel.Draw(ourShader);
-
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
