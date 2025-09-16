@@ -86,7 +86,7 @@ int main()
 
     // load models
     // -----------
-    Model ourModel(std::filesystem::path("./resources/assets/mary/Marry.obj").string());
+    Model ourModel(std::filesystem::path("./resources/objects/mary/Marry.obj").string());
     //Model ourModel(std::filesystem::path("./resources/objects/backpack/backpack.obj").string());
     
     // draw in wireframe
