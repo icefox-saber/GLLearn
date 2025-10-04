@@ -18,6 +18,7 @@ file(COPY ${RESOURCE_DIR} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include # 添加项目头文件路径
+    ${CMAKE_CURRENT_SOURCE_DIR}/assimp/contrib/stb
 )
 
 
