@@ -11,7 +11,7 @@ std::string ReadFile<std::string>(const std::filesystem::path& filePath) {
     
     // 使用filesystem获取文件大小，避免seek操作
     const auto fileSize = std::filesystem::file_size(filePath);
-    std::string content(fileSize, '\0');
+    std::string content(static_cast<unsigned int>(fileSize), '\0');
     file.read(content.data(), fileSize);
     file.close();
     
