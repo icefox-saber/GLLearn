@@ -334,7 +334,7 @@ int main()
     glfwGetFramebufferSize(window, &scrWidth, &scrHeight);
     glViewport(0, 0, scrWidth, scrHeight);
 
-    Model ttm("resources/objects/cyborg_with_thermal_kata_extracted/scene.gltf");
+    Model ttm("resources/objects/restaurant_chair_and_tab_extracted/scene.gltf");
 
     // render loop
     // -----------
@@ -373,6 +373,7 @@ int main()
 
 
         model = glm::mat4(1.0f);
+        model = glm::scale(model , glm::vec3(0.1f));
         model = glm::translate(model, glm::vec3(-5.0, 0.0, 2.0));
         pbrShader.setMat4("model", model);
         pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));

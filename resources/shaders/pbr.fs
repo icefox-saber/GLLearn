@@ -165,7 +165,9 @@ void main()
     vec3 ambient = (kD * diffuse + specular) * ao;
     
     vec3 color = ambient + Lo;
-
+    // emission
+    vec3 emission = pow(texture(emissionMap, TexCoords).rgb, vec3(2.2));
+    color += emission;
     // HDR tonemapping
     color = color / (color + vec3(1.0));
     // gamma correct

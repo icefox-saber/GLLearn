@@ -156,19 +156,27 @@ class Model {
 
         // 1. normal maps
         Texture normalMap = loadMaterialTextures(material, aiTextureType_NORMALS, "normalMap");
-        textures.push_back(normalMap);
+        if (!normalMap.path.empty()) {
+            textures.push_back(normalMap);
+        }
 
         // 2. metallicRoughness
-        Texture MRMap =
-            loadMaterialTextures(material, aiTextureType_GLTF_METALLIC_ROUGHNESS, "metallicRoughnessMap");
-        textures.push_back(MRMap);
+        Texture MRMap = loadMaterialTextures(material, aiTextureType_GLTF_METALLIC_ROUGHNESS, "metallicRoughnessMap");
+        if (!MRMap.path.empty()) {
+            textures.push_back(MRMap);
+        }
 
         // 3. aoMap
         Texture AOMap = loadMaterialTextures(material, aiTextureType_AMBIENT_OCCLUSION, "aoMap");
-        textures.push_back(AOMap);
+        if (!AOMap.path.empty()) {
+            textures.push_back(AOMap);
+        }
         // 4. emissionMap
         Texture emissiveMap = loadMaterialTextures(material, aiTextureType_EMISSIVE, "emissionMap");
-        textures.push_back(emissiveMap);
+        if (!emissiveMap.path.empty()) {
+            textures.push_back(emissiveMap);
+        }
+
         // return a mesh object created from the extracted mesh data
         return Mesh(vertices, indices, textures);
     }
@@ -176,7 +184,11 @@ class Model {
     // checks all material textures of a given type and loads the textures if they're not loaded yet.
     // the required info is returned as a Texture struct.
     Texture loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName) {
+
         Texture texture;
+        if (!mat->GetTextureCount(type)) {
+            return texture;
+        }
         aiString str;
         mat->GetTexture(type, 0, &str);
         // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
