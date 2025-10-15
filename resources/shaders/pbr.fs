@@ -7,9 +7,9 @@ in vec3 Normal;
 // material parameters
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
-uniform sampler2D metallicMap;
-uniform sampler2D roughnessMap;
+uniform sampler2D metallicRoughnessMap;
 uniform sampler2D aoMap;
+uniform sampler2D emissionMap;
 
 // IBL
 uniform samplerCube irradianceMap;
@@ -94,8 +94,8 @@ void main()
 {		
     // material properties
     vec3 albedo = pow(texture(albedoMap, TexCoords).rgb, vec3(2.2));
-    float metallic = texture(metallicMap, TexCoords).r;
-    float roughness = texture(roughnessMap, TexCoords).r;
+    float metallic = texture(metallicRoughnessMap, TexCoords).r;
+    float roughness = texture(metallicRoughnessMap, TexCoords).g;
     float ao = texture(aoMap, TexCoords).r;
        
     // input lighting data
