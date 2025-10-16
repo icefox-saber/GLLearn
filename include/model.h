@@ -32,6 +32,7 @@ class Model {
     vector<Texture> textures_loaded; // stores all the textures loaded so far, optimization to make sure textures aren't
                                      // loaded more than once.
     vector<Mesh> meshes;
+    vector<glm::mat4> meshTransforms;
     string directory;
     bool gammaCorrection;
 
@@ -45,6 +46,11 @@ class Model {
     }
 
   private:
+    // helper: convert aiMatrix4x4 to glm::mat4
+    glm::mat4 aiMat4ToGlm(const aiMatrix4x4 &m) {
+        return glm::mat4(m.a1, m.b1, m.c1, m.d1, m.a2, m.b2, m.c2, m.d2, m.a3, m.b3, m.c3, m.d3, m.a4, m.b4, m.c4,
+                         m.d4);
+    }
     // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
     void loadModel(string const &path) {
         // read file via ASSIMP
@@ -61,22 +67,26 @@ class Model {
         directory = path.substr(0, path.find_last_of('/'));
 
         // process ASSIMP's root node recursively
-        processNode(scene->mRootNode, scene);
+        processNode(scene->mRootNode, scene,glm::mat4(1.0f));
     }
 
     // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this
     // process on its children nodes (if any).
-    void processNode(aiNode *node, const aiScene *scene) {
+    void processNode(aiNode *node, const aiScene *scene , const glm::mat4 &parentTransform) {
+        glm::mat4 nodeTransform = aiMat4ToGlm(node->mTransformation);
+        glm::mat4 worldTransform = parentTransform * nodeTransform;
+
         // process each mesh located at the current node
         for (unsigned int i = 0; i < node->mNumMeshes; i++) {
             // the node object only contains indices to index the actual objects in the scene.
             // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
             aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
             meshes.push_back(processMesh(mesh, scene));
+            meshTransforms.push_back(worldTransform);
         }
         // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
         for (unsigned int i = 0; i < node->mNumChildren; i++) {
-            processNode(node->mChildren[i], scene);
+            processNode(node->mChildren[i], scene,worldTransform);
         }
     }
 
