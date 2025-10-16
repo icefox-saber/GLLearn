@@ -160,6 +160,19 @@ class Model {
         // 16 aiTextureType_DIFFUSE_ROUGHNESS这个没用
         // 27 aiTextureType_GLTF_METALLIC_ROUGHNESS
 
+
+        // 检查材质中所有常见纹理类型（0..27），并在控制台打印数量和第一个纹理路径（如果有）
+        /*for (int t = 0; t <= 27; ++t) {
+            aiTextureType tt = static_cast<aiTextureType>(t);
+            unsigned int count = material->GetTextureCount(tt);
+            if (count > 0) {
+                aiString path;
+                material->GetTexture(tt, 0, &path);
+                std::cout << "Texture type " << t << " has " << count << " textures"
+                          << " - first: " << (path.C_Str() ? path.C_Str() : "(empty)") << std::endl;
+            }
+        }*/
+
         // 0. albedoMap
         Texture basecolorMap = loadMaterialTextures(material, aiTextureType_BASE_COLOR, "albedoMap");
         textures.push_back(basecolorMap);

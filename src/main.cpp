@@ -124,7 +124,7 @@ int main() {
     // ---------------------------------
     stbi_set_flip_vertically_on_load(true);
     int width, height, nrComponents;
-    float *data = stbi_loadf("resources/textures/hdr/newport_loft.hdr", &width, &height, &nrComponents, 0);
+    float *data = stbi_loadf("resources/textures/hdr/industrial_wooden_attic_4k.hdr", &width, &height, &nrComponents, 0);
     unsigned int hdrTexture;
 
     if (data) {
@@ -360,7 +360,7 @@ int main() {
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0, 0.0, -10.0));
         model = glm::rotate(model,90.f,{1.f,0.f,0.f});
-        model = glm::scale(model, glm::vec3(10.0f));
+        //model = glm::scale(model, glm::vec3(1.0f));
         // draws the model, and thus all its meshes
         for (unsigned int i = 0; i < ttm.meshes.size(); i++) {
             glm::mat4 meshModel = model * ttm.meshTransforms[i];
