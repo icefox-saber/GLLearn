@@ -35,6 +35,57 @@ float lastFrame = 0.0f;
 
 unsigned int meshnum = 0;
 
+// 创建默认 1x1 纹理（albedo白、normal默认、metallic=0、roughness=0.5、ao=1）
+unsigned int make1x1RGB(unsigned char r, unsigned char g, unsigned char b, GLenum internal = GL_RGB8) {
+    unsigned int tex;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    unsigned char data[3] = {r, g, b};
+    glTexImage2D(GL_TEXTURE_2D, 0, internal, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    return tex;
+}
+
+vector<unsigned int> textures;
+
+void renderScene(Shader &shader, Model &scene) {
+    glm::mat4 model = glm::mat4(1.0f);
+
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0, 0.0, -10.0)); //本质是世界坐标平移
+    model = glm::rotate(model, glm::radians(90.f), {1.f, 0.f, 0.f});
+    model = glm::scale(model, glm::vec3(1.0f));
+    for (unsigned int i = 0; i < scene.meshes.size(); i++) {
+        glm::mat4 meshModel = model * scene.meshTransforms[i];
+        shader.setMat4("model", meshModel);
+        shader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(meshModel))));
+        scene.meshes[i].BindMaps(shader);
+        scene.meshes[i].Draw(shader);
+    }
+    for (unsigned int i = 0; i < MaterialList.size(); i++) {
+
+        glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
+        // retrieve texture number (the N in diffuse_textureN)
+        string name = MaterialList[i].first;
+
+        // now set the sampler to the correct texture unit
+        glUniform1i(glGetUniformLocation(shader.ID, (name).c_str()), i);
+        // and finally bind the texture
+        glBindTexture(GL_TEXTURE_2D, textures[i]);
+    }
+
+    // always good practice to set everything back to defaults once configured.
+    glActiveTexture(GL_TEXTURE0);
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0, -1.0, -10.0)); //本质是世界坐标平移
+    // model = glm::rotate(model, 90.f, {1.f, 0.f, 0.f});
+    model = glm::scale(model, glm::vec3(20.f, 1.f, 20.f));
+    shader.setMat4("model", model);
+    shader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+    renderCube();
+};
+
 int main() {
     // glfw: initialize and configure
     // ------------------------------
@@ -71,6 +122,14 @@ int main() {
         return -1;
     }
 
+    textures = {
+        // 用法
+        make1x1RGB(255, 255, 255),        // basecolor
+        make1x1RGB(0, 0, 255),            // 法线默认
+        make1x1RGB(0, 128, 0, GL_RG8),    // 金属=0（可用单通道）
+        make1x1RGB(128, 128, 128, GL_R8), // AO=1
+        make1x1RGB(0, 0, 0, GL_R8)        // EmissionMap
+    };
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
@@ -88,25 +147,54 @@ int main() {
     Shader prefilterShader("./resources/shaders/cubemap.vs", "./resources/shaders/prefilter.fs");
     Shader brdfShader("./resources/shaders/brdf.vs", "./resources/shaders/brdf.fs");
     Shader backgroundShader("./resources/shaders/background.vs", "./resources/shaders/background.fs");
+    Shader simpleDepthShader("./resources/shaders/shadow_map_depth.vs", "./resources/shaders/shadow_map_depth.fs");
+    Shader lightShader("./resources/shaders/light_cube.vs", "./resources/shaders/light_cube.fs");
+
+    Model ttm("resources/objects/cyborg_with_thermal_kata_extracted/scene.gltf");
 
     pbrShader.use();
     pbrShader.setInt("irradianceMap", 10);
     pbrShader.setInt("prefilterMap", 11);
     pbrShader.setInt("brdfLUT", 12);
+    pbrShader.setInt("shadowMap", 13);
 
     backgroundShader.use();
     backgroundShader.setInt("environmentMap", 0);
 
     // lights
-    // ------
-    glm::vec3 lightPositions[] = {
-        glm::vec3(-10.0f, 10.0f, 10.0f),
-        glm::vec3(10.0f, 10.0f, 10.0f),
-        glm::vec3(-10.0f, -10.0f, 10.0f),
-        glm::vec3(10.0f, -10.0f, 10.0f),
-    };
-    glm::vec3 lightColors[] = {glm::vec3(300.0f, 300.0f, 300.0f), glm::vec3(300.0f, 300.0f, 300.0f),
-                               glm::vec3(300.0f, 300.0f, 300.0f), glm::vec3(300.0f, 300.0f, 300.0f)};
+    // -----
+    glm::vec3 lightPositions = glm::vec3(0.0f, 4.0f, -10.0f);
+    glm::vec3 lightColors = glm::vec3(300.0f, 300.0f, 300.0f);
+
+    // 1. render depth of scene to texture (from light's perspective)
+    // configure depth map FBO
+    // -----------------------
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    unsigned int depthMapFBO;
+    glGenFramebuffers(1, &depthMapFBO);
+    // create depth texture
+    unsigned int depthMap;
+    glGenTextures(1, &depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT,
+                 NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = {1.0, 1.0, 1.0, 1.0};
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    // attach depth texture as FBO's depth buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    // --------------------------------------------------------------
+
+    // note that if you use a perspective projection matrix you'll have to change the light
+    // position as the current light position isn't enough to reflect the whole scene
+    // lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
 
     // pbr: setup framebuffer
     // ----------------------
@@ -124,7 +212,8 @@ int main() {
     // ---------------------------------
     stbi_set_flip_vertically_on_load(true);
     int width, height, nrComponents;
-    float *data = stbi_loadf("resources/textures/hdr/industrial_wooden_attic_4k.hdr", &width, &height, &nrComponents, 0);
+    float *data =
+        stbi_loadf("resources/textures/hdr/industrial_wooden_attic_4k.hdr", &width, &height, &nrComponents, 0);
     unsigned int hdrTexture;
 
     if (data) {
@@ -315,13 +404,20 @@ int main() {
     pbrShader.setMat4("projection", projection);
     backgroundShader.use();
     backgroundShader.setMat4("projection", projection);
+    float near_plane = 1.0f, far_plane = 100.f;
 
+    glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    // glm::mat4 lightProjection = glm::perspective(glm::radians(90.0f), (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT,
+    // near_plane, far_plane);
+    lightShader.use();
+    lightShader.setMat4("projection", projection);
+    lightShader.setVec3("lightColor", lightColors);
+
+    lightShader.setFloat("lightIntensity", 1.f);
     // then before rendering, configure the viewport to the original framebuffer's screen dimensions
     int scrWidth, scrHeight;
     glfwGetFramebufferSize(window, &scrWidth, &scrHeight);
     glViewport(0, 0, scrWidth, scrHeight);
-
-    Model ttm("resources/objects/cyborg_with_thermal_kata_extracted/scene.gltf");
 
     // render loop
     // -----------
@@ -336,19 +432,33 @@ int main() {
         // -----
         processInput(window);
 
-        // render
-        // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        glCullFace(GL_FRONT);
         // render scene, supplying the convoluted irradiance map to the final shader.
         // ------------------------------------------------------------------------------------------
+        glm::vec3 newPos = lightPositions/*+ glm::vec3(sin(glfwGetTime()) * 5.0, 0.0, 0.0)*/ ;
+
+        glm::mat4 lightView = glm::lookAt(newPos, glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, -1.f));
+        glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+        simpleDepthShader.use();
+        simpleDepthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+        renderScene(simpleDepthShader, ttm);
+
+        // reset
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glCullFace(GL_BACK);
         pbrShader.use();
-        glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.GetViewMatrix();
         pbrShader.setMat4("view", view);
         pbrShader.setVec3("camPos", camera.Position);
-
+        pbrShader.setVec3("lightPositions", newPos);
+        pbrShader.setVec3("lightColors", lightColors);
+        pbrShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
         // bind pre-computed IBL data
         glActiveTexture(GL_TEXTURE10);
         glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
@@ -356,35 +466,19 @@ int main() {
         glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
         glActiveTexture(GL_TEXTURE12);
         glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
+        glActiveTexture(GL_TEXTURE13);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
 
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0, 0.0, -10.0));
-        model = glm::rotate(model,90.f,{1.f,0.f,0.f});
-        //model = glm::scale(model, glm::vec3(1.0f));
         // draws the model, and thus all its meshes
-        for (unsigned int i = 0; i < ttm.meshes.size(); i++) {
-            glm::mat4 meshModel = model * ttm.meshTransforms[i];
-            pbrShader.setMat4("model", meshModel);
-            pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(meshModel))));
-            ttm.meshes[i].Draw(pbrShader);
-        }
+        renderScene(pbrShader, ttm);
 
-        // render light source (simply re-render sphere at light positions)
-        // this looks a bit off as we use the same shader, but it'll make their positions obvious and
-        // keeps the codeprint small.
-        for (unsigned int i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i) {
-            glm::vec3 newPos = lightPositions[i] + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
-            newPos = lightPositions[i];
-            pbrShader.setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
-            pbrShader.setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
-
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, newPos);
-            model = glm::scale(model, glm::vec3(0.5f));
-            pbrShader.setMat4("model", model);
-            pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
-            renderSphere();
-        }
+        lightShader.use();
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, newPos);
+        model = glm::scale(model, glm::vec3(0.5f));
+        lightShader.setMat4("model", model);
+        lightShader.setMat4("view", view);
+        renderSphere();
 
         // render skybox (render as last to prevent overdraw)
         backgroundShader.use();

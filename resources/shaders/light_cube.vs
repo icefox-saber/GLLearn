@@ -1,11 +1,12 @@
 #version 330 core
 layout (location = 0) in vec3 aVertexPosition;
 
-uniform mat4 uModelViewMatrix;
-uniform mat4 uProjectionMatrix;
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
 
-void main(void) {
+void main() {
 
-  gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition, 1.0);
+  gl_Position = projection * view * model * vec4(aVertexPosition, 1.0);
 
 }

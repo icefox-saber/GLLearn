@@ -67,12 +67,12 @@ class Model {
         directory = path.substr(0, path.find_last_of('/'));
 
         // process ASSIMP's root node recursively
-        processNode(scene->mRootNode, scene,glm::mat4(1.0f));
+        processNode(scene->mRootNode, scene, glm::mat4(1.0f));
     }
 
     // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this
     // process on its children nodes (if any).
-    void processNode(aiNode *node, const aiScene *scene , const glm::mat4 &parentTransform) {
+    void processNode(aiNode *node, const aiScene *scene, const glm::mat4 &parentTransform) {
         glm::mat4 nodeTransform = aiMat4ToGlm(node->mTransformation);
         glm::mat4 worldTransform = parentTransform * nodeTransform;
 
@@ -86,7 +86,7 @@ class Model {
         }
         // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
         for (unsigned int i = 0; i < node->mNumChildren; i++) {
-            processNode(node->mChildren[i], scene,worldTransform);
+            processNode(node->mChildren[i], scene, worldTransform);
         }
     }
 
@@ -94,7 +94,7 @@ class Model {
         // data to fill
         vector<Vertex> vertices;
         vector<unsigned int> indices;
-        vector<Texture> textures;
+        vector<Texture> textures(MaterialList.size());
 
         // walk through each of the mesh's vertices
         for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
@@ -160,7 +160,6 @@ class Model {
         // 16 aiTextureType_DIFFUSE_ROUGHNESS这个没用
         // 27 aiTextureType_GLTF_METALLIC_ROUGHNESS
 
-
         // 检查材质中所有常见纹理类型（0..27），并在控制台打印数量和第一个纹理路径（如果有）
         /*for (int t = 0; t <= 27; ++t) {
             aiTextureType tt = static_cast<aiTextureType>(t);
@@ -172,32 +171,8 @@ class Model {
                           << " - first: " << (path.C_Str() ? path.C_Str() : "(empty)") << std::endl;
             }
         }*/
-
-        // 0. albedoMap
-        Texture basecolorMap = loadMaterialTextures(material, aiTextureType_BASE_COLOR, "albedoMap");
-        textures.push_back(basecolorMap);
-
-        // 1. normal maps
-        Texture normalMap = loadMaterialTextures(material, aiTextureType_NORMALS, "normalMap");
-        if (!normalMap.path.empty()) {
-            textures.push_back(normalMap);
-        }
-
-        // 2. metallicRoughness
-        Texture MRMap = loadMaterialTextures(material, aiTextureType_GLTF_METALLIC_ROUGHNESS, "metallicRoughnessMap");
-        if (!MRMap.path.empty()) {
-            textures.push_back(MRMap);
-        }
-
-        // 3. aoMap
-        Texture AOMap = loadMaterialTextures(material, aiTextureType_AMBIENT_OCCLUSION, "aoMap");
-        if (!AOMap.path.empty()) {
-            textures.push_back(AOMap);
-        }
-        // 4. emissionMap
-        Texture emissiveMap = loadMaterialTextures(material, aiTextureType_EMISSIVE, "emissionMap");
-        if (!emissiveMap.path.empty()) {
-            textures.push_back(emissiveMap);
+        for (int i = 0; i < MaterialList.size(); i++) {
+            textures[i] = loadMaterialTextures(material, MaterialList[i].second, "albedoMap");
         }
 
         // return a mesh object created from the extracted mesh data

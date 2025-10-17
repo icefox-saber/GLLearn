@@ -1,24 +1,27 @@
 #version 330 core
 out vec4 FragColor;
+
 in vec2 TexCoords;
 in vec3 WorldPos;
 in vec3 Normal;
-
+in vec4 WorldPosLightSpace;
 // material parameters
-uniform sampler2D albedoMap;
-uniform sampler2D normalMap;
-uniform sampler2D metallicRoughnessMap;
-uniform sampler2D aoMap;
-uniform sampler2D emissionMap;
+uniform sampler2D albedoMap;//0
+uniform sampler2D normalMap;//1
+uniform sampler2D metallicRoughnessMap;//2
+uniform sampler2D aoMap;//3
+uniform sampler2D emissionMap;//4
 
 // IBL
-uniform samplerCube irradianceMap;
-uniform samplerCube prefilterMap;
-uniform sampler2D brdfLUT;
+uniform samplerCube irradianceMap; //10
+uniform samplerCube prefilterMap; //11
+uniform sampler2D brdfLUT; //12
+uniform sampler2D shadowMap; //13
+
 
 // lights
-uniform vec3 lightPositions[4];
-uniform vec3 lightColors[4];
+uniform vec3 lightPositions;
+uniform vec3 lightColors;
 
 uniform vec3 camPos;
 
@@ -89,6 +92,43 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 {
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }   
+
+float ShadowCalculation(vec4 WorldPosLightSpace)
+{
+    // perform perspective divide
+    vec3 projCoords = WorldPosLightSpace.xyz / WorldPosLightSpace.w;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range WorldPosLight as coords)
+    float closestDepth = texture(shadowMap, projCoords.xy).r; 
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    // calculate bias (based on depth map resolution and slope)
+    vec3 normal = normalize(Normal);
+    vec3 lightDir = normalize(lightPositions - WorldPos);
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    // check whether current frag pos is in shadow
+    // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+    // PCF
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+    for(int x = -1; x <= 1; ++x)
+    {
+        for(int y = -1; y <= 1; ++y)
+        {
+            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
+            shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
+        }    
+    }
+    shadow /= 9.0;
+    
+    // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
+    if(projCoords.z > 1.0)
+        shadow = 0.0;
+        
+    return shadow;
+}
+
 // ----------------------------------------------------------------------------
 void main()
 {		
@@ -107,17 +147,18 @@ void main()
     // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
     vec3 F0 = vec3(0.04); 
     F0 = mix(F0, albedo, metallic);
-
     // reflectance equation
+    float shadow = ShadowCalculation(WorldPosLightSpace);   
+
     vec3 Lo = vec3(0.0);
-    for(int i = 0; i < 4; ++i) 
     {
+
         // calculate per-light radiance
-        vec3 L = normalize(lightPositions[i] - WorldPos);
+        vec3 L = normalize(lightPositions - WorldPos);
         vec3 H = normalize(V + L);
-        float distance = length(lightPositions[i] - WorldPos);
-        float attenuation = 1.0 / (distance * distance);
-        vec3 radiance = lightColors[i] * attenuation;
+        float distance = length(lightPositions - WorldPos);
+        float attenuation = (1.0-shadow) / (distance * distance);
+        vec3 radiance = lightColors * attenuation;
 
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, roughness);   
@@ -128,7 +169,7 @@ void main()
         float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
         vec3 specular = numerator / denominator;
         
-         // kS is equal to Fresnel
+            // kS is equal to Fresnel
         vec3 kS = F;
         // for energy conservation, the diffuse and specular light can't
         // be above 1.0 (unless the surface emits light); to preserve this
@@ -144,8 +185,7 @@ void main()
 
         // add to outgoing radiance Lo
         Lo += (kD * albedo / PI + specular) * radiance * NdotL; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-    }   
-    
+    }
     // ambient lighting (we now use IBL as the ambient term)
     vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
     
@@ -174,4 +214,5 @@ void main()
     color = pow(color, vec3(1.0/2.2)); 
 
     FragColor = vec4(color , 1.0);
+    //FragColor = vec4(vec3(1.0 - shadow), 1.0); // debug: invert color
 }
