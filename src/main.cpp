@@ -1,3 +1,4 @@
+//main.cpp
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
@@ -53,7 +54,7 @@ void renderScene(Shader &shader, Model &scene) {
     glm::mat4 model = glm::mat4(1.0f);
 
     model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0, 0.0, -10.0)); //本质是世界坐标平移
+    model = glm::translate(model, glm::vec3(0.0, -4.0, -5.0)); //本质是世界坐标平移
     model = glm::rotate(model, glm::radians(90.f), {1.f, 0.f, 0.f});
     model = glm::scale(model, glm::vec3(1.0f));
     for (unsigned int i = 0; i < scene.meshes.size(); i++) {
@@ -78,7 +79,7 @@ void renderScene(Shader &shader, Model &scene) {
     // always good practice to set everything back to defaults once configured.
     glActiveTexture(GL_TEXTURE0);
     model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0, -1.0, -10.0)); //本质是世界坐标平移
+    model = glm::translate(model, glm::vec3(0.0, -6.0, -5.0)); //本质是世界坐标平移
     // model = glm::rotate(model, 90.f, {1.f, 0.f, 0.f});
     model = glm::scale(model, glm::vec3(20.f, 1.f, 20.f));
     shader.setMat4("model", model);
@@ -150,7 +151,7 @@ int main() {
     Shader simpleDepthShader("./resources/shaders/shadow_map_depth.vs", "./resources/shaders/shadow_map_depth.fs");
     Shader lightShader("./resources/shaders/light_cube.vs", "./resources/shaders/light_cube.fs");
 
-    Model ttm("resources/objects/cyborg_with_thermal_kata_extracted/scene.gltf");
+    Model ttm("resources/objects/proof_of_concept_scifi_g_extracted/scene.gltf");
 
     pbrShader.use();
     pbrShader.setInt("irradianceMap", 10);
@@ -440,7 +441,7 @@ int main() {
         // ------------------------------------------------------------------------------------------
         glm::vec3 newPos = lightPositions/*+ glm::vec3(sin(glfwGetTime()) * 5.0, 0.0, 0.0)*/ ;
 
-        glm::mat4 lightView = glm::lookAt(newPos, glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, -1.f));
+        glm::mat4 lightView = glm::lookAt(newPos, glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f));
         glm::mat4 lightSpaceMatrix = lightProjection * lightView;
         simpleDepthShader.use();
         simpleDepthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
@@ -475,7 +476,7 @@ int main() {
         lightShader.use();
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, newPos);
-        model = glm::scale(model, glm::vec3(0.5f));
+        model = glm::scale(model, glm::vec3(0.05f));
         lightShader.setMat4("model", model);
         lightShader.setMat4("view", view);
         renderSphere();

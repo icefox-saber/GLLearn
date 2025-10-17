@@ -171,7 +171,7 @@ class Model {
                           << " - first: " << (path.C_Str() ? path.C_Str() : "(empty)") << std::endl;
             }
         }*/
-        for (int i = 0; i < MaterialList.size(); i++) {
+        for (unsigned int i = 0U; i < MaterialList.size(); i++) {
             textures[i] = loadMaterialTextures(material, MaterialList[i].second, "albedoMap");
         }
 
